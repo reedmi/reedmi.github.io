@@ -7,15 +7,15 @@
   
   <title>线程池 | 学习笔记</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、为什么要使用线程池？1、操作系统实现线程的三种方式：用户线程、内核线程、用户线程+内核线程； 2、成本：创建新线程的成本比较高（餐馆招新员工）； 3、复用：让尽可能少的线程，干尽可能多的任务； 二、如何设计”池”？三、任务执行过程四、问题思考五、参考资料">
+  <meta name="description" content="一、为什么要使用线程池？1、问题：开销高，利用率低操作系统实现线程的三种方式：用户线程、内核线程、用户线程+内核线程，java线程与操作系统1-1对应。 反复创建和销毁线程的系统开销比较大，而且还会占用过多的内存资源。  类比开餐馆，每来一个客人，就招聘一个新服务员招待，利用率太低  2、解决思路任何计算机问题，都可以加一层中间层来解决。创建一定数量的线程，反复执行任务，多余的任务则进入队列排队；">
 <meta property="og:type" content="article">
 <meta property="og:title" content="线程池">
 <meta property="og:url" content="http://example.com/2020/11/08/thread-pool/index.html">
 <meta property="og:site_name" content="学习笔记">
-<meta property="og:description" content="一、为什么要使用线程池？1、操作系统实现线程的三种方式：用户线程、内核线程、用户线程+内核线程； 2、成本：创建新线程的成本比较高（餐馆招新员工）； 3、复用：让尽可能少的线程，干尽可能多的任务； 二、如何设计”池”？三、任务执行过程四、问题思考五、参考资料">
+<meta property="og:description" content="一、为什么要使用线程池？1、问题：开销高，利用率低操作系统实现线程的三种方式：用户线程、内核线程、用户线程+内核线程，java线程与操作系统1-1对应。 反复创建和销毁线程的系统开销比较大，而且还会占用过多的内存资源。  类比开餐馆，每来一个客人，就招聘一个新服务员招待，利用率太低  2、解决思路任何计算机问题，都可以加一层中间层来解决。创建一定数量的线程，反复执行任务，多余的任务则进入队列排队；">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-11-08T03:18:57.000Z">
-<meta property="article:modified_time" content="2020-11-08T03:53:21.756Z">
+<meta property="article:modified_time" content="2020-11-08T04:17:07.209Z">
 <meta property="article:author" content="reedmi">
 <meta name="twitter:card" content="summary">
   
@@ -88,10 +88,20 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一、为什么要使用线程池？"><a href="#一、为什么要使用线程池？" class="headerlink" title="一、为什么要使用线程池？"></a>一、为什么要使用线程池？</h3><p>1、操作系统实现线程的三种方式：用户线程、内核线程、用户线程+内核线程；</p>
-<p>2、成本：创建新线程的成本比较高（餐馆招新员工）；</p>
-<p>3、复用：让尽可能少的线程，干尽可能多的任务；</p>
-<h3 id="二、如何设计”池”？"><a href="#二、如何设计”池”？" class="headerlink" title="二、如何设计”池”？"></a>二、如何设计”池”？</h3><h3 id="三、任务执行过程"><a href="#三、任务执行过程" class="headerlink" title="三、任务执行过程"></a>三、任务执行过程</h3><h3 id="四、问题思考"><a href="#四、问题思考" class="headerlink" title="四、问题思考"></a>四、问题思考</h3><h3 id="五、参考资料"><a href="#五、参考资料" class="headerlink" title="五、参考资料"></a>五、参考资料</h3>
+        <h3 id="一、为什么要使用线程池？"><a href="#一、为什么要使用线程池？" class="headerlink" title="一、为什么要使用线程池？"></a>一、为什么要使用线程池？</h3><h5 id="1、问题：开销高，利用率低"><a href="#1、问题：开销高，利用率低" class="headerlink" title="1、问题：开销高，利用率低"></a>1、问题：开销高，利用率低</h5><p>操作系统实现线程的三种方式：用户线程、内核线程、用户线程+内核线程，java线程与操作系统1-1对应。</p>
+<p>反复创建和销毁线程的系统开销比较大，而且还会占用过多的内存资源。</p>
+<blockquote>
+<p>类比开餐馆，每来一个客人，就招聘一个新服务员招待，利用率太低</p>
+</blockquote>
+<h5 id="2、解决思路"><a href="#2、解决思路" class="headerlink" title="2、解决思路"></a>2、解决思路</h5><p><code>任何计算机问题，都可以加一层中间层来解决。</code>创建一定数量的线程，反复执行任务，多余的任务则进入队列排队；</p>
+<blockquote>
+<p>服务员数量一定，超出的顾客排队等待就餐</p>
+</blockquote>
+<h5 id="3、好处"><a href="#3、好处" class="headerlink" title="3、好处"></a>3、好处</h5><ul>
+<li>加快响应速度，服务员时刻准备着，客人可以立刻被安排；</li>
+<li>集中管理、监控，统筹资源利用率</li>
+</ul>
+<h3 id="二、JDK如何实现？"><a href="#二、JDK如何实现？" class="headerlink" title="二、JDK如何实现？"></a>二、JDK如何实现？</h3><h3 id="三、任务执行过程"><a href="#三、任务执行过程" class="headerlink" title="三、任务执行过程"></a>三、任务执行过程</h3><h3 id="四、问题思考"><a href="#四、问题思考" class="headerlink" title="四、问题思考"></a>四、问题思考</h3><h3 id="五、参考资料"><a href="#五、参考资料" class="headerlink" title="五、参考资料"></a>五、参考资料</h3>
       
     </div>
     <footer class="article-footer">
