@@ -28,7 +28,7 @@
 <meta property="og:description" content="为什么要使用线程池？问题：开销高，利用率低操作系统实现线程的三种方式：用户线程、内核线程、用户线程+内核线程，java线程与操作系统1-1对应。 反复创建和销毁线程的系统开销比较大，而且还会占用过多的内存资源。  类比开餐馆，每来一个客人，就招聘一个新服务员招待，利用率太低  解决思路任何计算机问题，都可以加一层中间层来解决。创建一定数量的线程，反复执行任务，多余的任务则进入队列排队；  服务员数">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-11-08T03:18:57.000Z">
-<meta property="article:modified_time" content="2020-11-13T01:43:30.225Z">
+<meta property="article:modified_time" content="2020-11-13T05:07:04.291Z">
 <meta property="article:author" content="reedmi">
 <meta name="twitter:card" content="summary">
 
@@ -181,7 +181,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-13 09:43:30" itemprop="dateModified" datetime="2020-11-13T09:43:30+08:00">2020-11-13</time>
+                <time title="修改时间：2020-11-13 13:07:04" itemprop="dateModified" datetime="2020-11-13T13:07:04+08:00">2020-11-13</time>
               </span>
 
           
@@ -208,7 +208,12 @@
 <li>加快响应速度，服务员时刻准备着，客人可以立刻被安排；</li>
 <li>集中管理、监控，统筹资源利用率</li>
 </ul>
-<h1 id="JDK如何实现？"><a href="#JDK如何实现？" class="headerlink" title="JDK如何实现？"></a>JDK如何实现？</h1><h1 id="任务执行过程"><a href="#任务执行过程" class="headerlink" title="任务执行过程"></a>任务执行过程</h1><h1 id="问题思考"><a href="#问题思考" class="headerlink" title="问题思考"></a>问题思考</h1><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1>
+<h1 id="JDK如何实现？"><a href="#JDK如何实现？" class="headerlink" title="JDK如何实现？"></a>JDK如何实现？</h1><p>设计思想：全职员工+临时工，让每个人工作尽可能饱和，但是人力资源成本要最低。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ThreadPoolExecutor</span><br><span class="line">  <span class="keyword">volatile</span> ThreadFactory threadFactory; <span class="comment">//新建Thread</span></span><br><span class="line">  <span class="keyword">volatile</span> <span class="keyword">int</span> corePoolSize; <span class="comment">//核心线程数</span></span><br><span class="line">	<span class="keyword">final</span> BlockingQueue&lt;Runnable&gt; workQueue; <span class="comment">//阻塞队列（为什么要用阻塞队列，非阻塞行不？）</span></span><br><span class="line">	<span class="keyword">volatile</span> <span class="keyword">int</span> maximumPoolSize; <span class="comment">//最大线程数</span></span><br><span class="line">	<span class="keyword">volatile</span> RejectedExecutionHandler handler; <span class="comment">//拒绝策略</span></span><br><span class="line">	<span class="keyword">volatile</span> <span class="keyword">long</span> keepAliveTime; <span class="comment">//空等回收时间</span></span><br><span class="line">  <span class="keyword">volatile</span> <span class="keyword">boolean</span> allowCoreThreadTimeOut; <span class="comment">//是否允许核心线程被回收</span></span><br><span class="line">	</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="任务执行过程"><a href="#任务执行过程" class="headerlink" title="任务执行过程"></a>任务执行过程</h1><h1 id="问题思考"><a href="#问题思考" class="headerlink" title="问题思考"></a>问题思考</h1><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1>
     </div>
 
     
